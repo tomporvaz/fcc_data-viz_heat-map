@@ -10,17 +10,65 @@
 </head>
 <body>
     <script>
-        d3.json("https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/cyclist-data.json")
+        d3.json("https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/global-temperature.json")
         .then(function(data){
             
             //declare  variables
             const w = 900;
             const h = 500;
+            const hCell = 30; //height of each cell
+            const wCell = 3; //width of each cell
+            const padding = 50;
+            const monthlyVar = data.monthlyVariance;
+            
+            /*.filter(
+                x => x.year === 1753
+            );*/
+
+            const mmDate = d3.timeParse("%m");
+            const yyyyDate = d3.timeParse("%Y");
+
+            const graph = d3.select("figure").append("svg")
+            .attr("width", w)
+            .attr("height", h);
+
+            //graph description
+            graph.append("desc")
+            .attr("id", "description")
+            .append("text")
+            .text("OMG, look at that heat map.  It shows you how much hotter or cooler the world has been year after year, month to month");
+
+            //Scales   
+            const xScale = d3.scaleTime()
+            .domain([d3.min(monthlyVar, d => yyyyDate(d.year)), d3.max(monthlyVar, d => yyyyDate(d.year))])
+            .range([padding, w - padding]);
+
+            const yScale = d3.scaleTime()
+            .domain([d3.min(d => mmDate(monthlyVar, d.month)), d3.max(monthlyVar, d => mmDate(d.month))])
+            .range([padding, h - padding]);
+
+            //add continuous scale for color of rect
+
+
+            //add rect cells
+            graph.selectAll("rect")
+            .data(monthlyVar)
+            .enter()
+            .append("rect")
+            .attr("x", d => xScale(yyyyDate(d.year)))
+            .attr("y", (d => (d.month * (hCell + 5))))
+            .attr("width", wCell)
+            .attr("height", hCell)
+            .attr("class", "cell");
+
+            //test output
+            console.log("mmDate(data[0].month): " + mmDate(monthlyVar[1].month));
+       
             
             });
         </script>
         
-        
+        <h1 id="title">Heat Map</h1>
         <figure></figure>
         
         <script src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"></script>
