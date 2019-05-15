@@ -18,7 +18,7 @@
             const h = 500;
             const hCell = 30; //height of each cell
             const wCell = 3; //width of each cell
-            const padding = 50;
+            const padding = 40;
             const monthlyVar = data.monthlyVariance;
             
             /*.filter(
@@ -44,8 +44,8 @@
             .range([padding, w - padding]);
             
             const yScale = d3.scaleTime()
-            .domain([d3.min(d => mmDate(monthlyVar, d.month)), d3.max(monthlyVar, d => mmDate(d.month))])
-            .range([padding, h - padding]);
+            .domain([d3.min(monthlyVar, d => mmDate(d.month)), d3.max(monthlyVar, d => mmDate(d.month))])
+            .range([padding, h - padding - padding]);
             
             //add continuous scale for color of rect
             
@@ -56,7 +56,7 @@
             .enter()
             .append("rect")
             .attr("x", d => xScale(yyyyDate(d.year)))
-            .attr("y", (d => (d.month * (hCell + 5))))
+            .attr("y", (d => (yScale(mmDate(d.month)))))
             .attr("width", wCell)
             .attr("height", hCell)
             .attr("class", "cell")
@@ -73,8 +73,22 @@
             .call(xAxis)
             .attr("id", "x-axis");
             
+            //y axis for months
+            const yAxis = d3.axisLeft(yScale)
+            .tickFormat(d3.timeFormat("%B"));
+            
+            graph.append("g")
+            .attr("transform",
+            "translate(" + padding + ", 0)")
+            .call(yAxis)
+            .attr("id", "y-axis");
+            
+            
+            
             //test output
             console.log("mmDate(data[0].month): " + mmDate(monthlyVar[1].month));
+            console.log("Min:" +  d3.min(monthlyVar, d => mmDate(d.month)));
+            console.log("Max: " + d3.max(monthlyVar, d => mmDate(d.month)));
             
             
         });
