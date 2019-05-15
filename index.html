@@ -15,16 +15,13 @@
             
             //declare  variables
             const w = 900;
-            const h = 500;
+            const h = 600;
             const hCell = 25; //height of each cell
             const wCell = 3; //width of each cell
             const padding = 40;
+            const bottomPadding = 80;
             const monthlyVar = data.monthlyVariance;
-            
-            /*.filter(
-            x => x.year === 1753
-            );*/
-            
+                        
             const mmDate = d3.timeParse("%m");
             const yyyyDate = d3.timeParse("%Y");
             
@@ -45,9 +42,13 @@
             
             const yScale = d3.scaleTime()
             .domain([d3.min(monthlyVar, d => mmDate(d.month)), d3.max(monthlyVar, d => mmDate(d.month))])
-            .range([padding, h - (padding + hCell)]);
+            .range([padding, h - (bottomPadding + hCell)]);
             
             //add continuous scale for color of rect
+            const colorScale = d3.scaleSequential(
+                [d3.max(monthlyVar, d => d.variance), d3.min(monthlyVar, d => d.variance)],
+                t => d3.interpolateSpectral(t)
+            );
             
             
             //add rect cells
@@ -57,6 +58,7 @@
             .append("rect")
             .attr("x", d => xScale(yyyyDate(d.year)))
             .attr("y", (d => (yScale(mmDate(d.month)))))
+            .attr("fill", d => colorScale(d.variance))
             .attr("width", wCell)
             .attr("height", hCell)
             .attr("class", "cell")
@@ -69,7 +71,7 @@
             
             graph.append("g")
             .attr("transform",
-            "translate(0, " + (h - padding) + ")")
+            "translate(0, " + (h - bottomPadding) + ")")
             .call(xAxis)
             .attr("id", "x-axis");
             
@@ -82,13 +84,28 @@
             "translate(" + (padding * 2) + ", 0)")
             .call(yAxis)
             .attr("id", "y-axis");
+
+            //legend
+            const legend = graph.append("svg")
+            .attr("height", 100)
+            .attr("width", 300)
+            .attr("transform", "translate(" + padding + ", 500)")
+            .attr("fill", "grey");
             
+           /*  const arr10 = [5.228, 2.177, -0.874, -3.925, -6.976]
+            legend.selectAll("rect")
+            .data(arr10)
+            .enter()
+            .append("rect")
+            .
+             */
             
             
             //test output
             console.log("mmDate(data[0].month): " + mmDate(monthlyVar[1].month));
             console.log("Min:" +  d3.min(monthlyVar, d => mmDate(d.month)));
             console.log("Max: " + d3.max(monthlyVar, d => mmDate(d.month)));
+            console.log("Sequential Range: " + [d3.max(monthlyVar, d => d.variance), d3.min(monthlyVar, d => d.variance)]);
             
             
         });
