@@ -16,7 +16,7 @@
             //declare  variables
             const w = 900;
             const h = 500;
-            const hCell = 30; //height of each cell
+            const hCell = 25; //height of each cell
             const wCell = 3; //width of each cell
             const padding = 40;
             const monthlyVar = data.monthlyVariance;
@@ -41,11 +41,11 @@
             //Scales   
             const xScale = d3.scaleTime()
             .domain([d3.min(monthlyVar, d => yyyyDate(d.year)), d3.max(monthlyVar, d => yyyyDate(d.year))])
-            .range([padding, w - padding]);
+            .range([(padding * 2), w - padding]);
             
             const yScale = d3.scaleTime()
             .domain([d3.min(monthlyVar, d => mmDate(d.month)), d3.max(monthlyVar, d => mmDate(d.month))])
-            .range([padding, h - padding - padding]);
+            .range([padding, h - (padding + hCell)]);
             
             //add continuous scale for color of rect
             
@@ -79,7 +79,7 @@
             
             graph.append("g")
             .attr("transform",
-            "translate(" + padding + ", 0)")
+            "translate(" + (padding * 2) + ", 0)")
             .call(yAxis)
             .attr("id", "y-axis");
             
