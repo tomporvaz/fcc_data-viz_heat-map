@@ -14,12 +14,12 @@
         .then(function(data){
             
             //declare  variables
-            const w = 900;
-            const h = 600;
-            const hCell = 25; //height of each cell
-            const wCell = 3; //width of each cell
+            const w = 1315;
+            const h = 650;
+            const hCell = 30; //height of each cell
+            const wCell = 5; //width of each cell
             const padding = 40;
-            const bottomPadding = 80;
+            const bottomPadding = 120;
             const monthlyVar = data.monthlyVariance;
                         
             const mmDate = d3.timeParse("%m");
@@ -57,7 +57,7 @@
             .enter()
             .append("rect")
             .attr("x", d => xScale(yyyyDate(d.year)))
-            .attr("y", (d => (yScale(mmDate(d.month)))))
+            .attr("y", (d => ((yScale(mmDate(d.month)))) - (hCell / 2)))
             .attr("fill", d => colorScale(d.variance))
             .attr("width", wCell)
             .attr("height", hCell)
@@ -89,16 +89,35 @@
             const legend = graph.append("svg")
             .attr("height", 100)
             .attr("width", 300)
+            .attr("x", 120)
+            .attr("y", 570)
             .attr("transform", "translate(" + padding + ", 500)")
-            .attr("fill", "grey");
+            .attr("id", "legend"); 
             
-           /*  const arr10 = [5.228, 2.177, -0.874, -3.925, -6.976]
+            const arr10 = [-6.976, -3.925, -0.874, 2.177, 5.228]
             legend.selectAll("rect")
             .data(arr10)
             .enter()
             .append("rect")
-            .
-             */
+            .attr("x", (d, i) => ((i * 50)))
+            .attr("y", 15)
+            .attr("width", 50)
+            .attr("height", 50)
+            .attr("fill", d => colorScale(d));
+
+            legend.selectAll("text")
+            .data(arr10)
+            .enter()
+            .append("text")
+            .attr("x", (d, i) => ((i * 50) + 5))
+            .attr("y", 45)
+            .attr("fill", "black")
+            .text(d => d);
+        
+            legend.append("text")
+            .text("Temp Variance (Celsius)")
+            .attr("x", 45)
+            .attr("y", 12);
             
             
             //test output
@@ -106,7 +125,9 @@
             console.log("Min:" +  d3.min(monthlyVar, d => mmDate(d.month)));
             console.log("Max: " + d3.max(monthlyVar, d => mmDate(d.month)));
             console.log("Sequential Range: " + [d3.max(monthlyVar, d => d.variance), d3.min(monthlyVar, d => d.variance)]);
-            
+            const yearRange = [d3.min(monthlyVar, d => yyyyDate(d.year)), d3.max(monthlyVar, d => yyyyDate(d.year))];
+            const yearFormat = d3.timeFormat("%Y");
+            console.log("Year Range is: " + yearRange + " Year difference is: " +  (yearRange[1] - yearRange[0]));
             
         });
     </script>
