@@ -24,6 +24,7 @@
                         
             const mmDate = d3.timeParse("%m");
             const yyyyDate = d3.timeParse("%Y");
+            const monthFormat = d3.timeFormat("%B");
             
             const graph = d3.select("figure").append("svg")
             .attr("width", w)
@@ -64,8 +65,35 @@
             .attr("class", "cell")
             .attr("data-month", d => (d.month - 1))
             .attr("data-year", d => d.year)
-            .attr("data-temp", d => d.variance);
+            .attr("data-temp", d => d.variance)
+            .on("mouseover", showTip)
+            .on("mousemove", d => moveTip(d))
+            .on("mouseout", hideTip);
             
+            //tooltip declaration and functions copied and modifired from https://bl.ocks.org/mbostock/1087001
+            let tooltip = d3.select("body")
+            .append("div")
+            .attr("id", "tooltip")
+            .style("display", "none");
+            
+            
+            function showTip() {
+                tooltip.style("display", "inline");
+            }
+            
+            function moveTip(data) {
+                tooltip.text(monthFormat(mmDate(data.month)) + " " + data.year + ";  Temp: " + (data.variance + 8.66).toFixed(3))
+                .attr("data-year", data.year)
+                .style("left", (d3.event.pageX + 5) + "px")
+                .style("top", (d3.event.pageY - 20) + "px");
+            }
+            
+            function hideTip() {
+                tooltip.style("display", "none");
+            };
+            
+
+
             //x axis of year
             const xAxis = d3.axisBottom(xScale);
             
@@ -85,6 +113,8 @@
             .call(yAxis)
             .attr("id", "y-axis");
 
+
+
             //legend
             const legend = graph.append("svg")
             .attr("height", 100)
@@ -94,45 +124,45 @@
             .attr("transform", "translate(" + padding + ", 500)")
             .attr("id", "legend"); 
             
-            const arr10 = [-6.976, -3.925, -0.874, 2.177, 5.228]
+            //create array 0 to 1 by increments of .01
+            const arr1 = [];
+            let x = -6.976;
+            for(let i = 0; i < 100; i++){
+                arr1.push(x);
+                x = x + .122;
+            }
+                    
             legend.selectAll("rect")
-            .data(arr10)
+            .data(arr1)
             .enter()
             .append("rect")
-            .attr("x", (d, i) => ((i * 50)))
+            .attr("x", (d, i) => ((i * 3)))
             .attr("y", 15)
-            .attr("width", 50)
+            .attr("width", 3)
             .attr("height", 50)
             .attr("fill", d => colorScale(d));
 
-            legend.selectAll("text")
-            .data(arr10)
-            .enter()
-            .append("text")
-            .attr("x", (d, i) => ((i * 50) + 5))
+            legend.append("text")
+            .attr("x", 5)
             .attr("y", 45)
-            .attr("fill", "black")
-            .text(d => d);
+            .attr("fill", "white")
+            .text(-6.976);
+
+            legend.append("text")
+            .attr("x", 260)
+            .attr("y", 45)
+            .attr("fill", "white")
+            .text(5.228);
         
             legend.append("text")
             .text("Temp Variance (Celsius)")
-            .attr("x", 45)
+            .attr("x", 65)
             .attr("y", 12);
-            
-            
-            //test output
-            console.log("mmDate(data[0].month): " + mmDate(monthlyVar[1].month));
-            console.log("Min:" +  d3.min(monthlyVar, d => mmDate(d.month)));
-            console.log("Max: " + d3.max(monthlyVar, d => mmDate(d.month)));
-            console.log("Sequential Range: " + [d3.max(monthlyVar, d => d.variance), d3.min(monthlyVar, d => d.variance)]);
-            const yearRange = [d3.min(monthlyVar, d => yyyyDate(d.year)), d3.max(monthlyVar, d => yyyyDate(d.year))];
-            const yearFormat = d3.timeFormat("%Y");
-            console.log("Year Range is: " + yearRange + " Year difference is: " +  (yearRange[1] - yearRange[0]));
-            
         });
     </script>
     
     <h1 id="title">Heat Map</h1>
+    <h2 id="subtitle">Tempreature Variance from Base 8.66 C, 1753-2015</h2>
     <figure></figure>
     
     <script src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"></script>
